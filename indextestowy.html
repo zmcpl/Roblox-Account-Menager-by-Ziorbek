@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Roblox Account Manager — by Ziorbek</title>
+<meta name="description" content="Roblox Account Manager by Ziorbek — zarządzaj wieloma kontami Roblox, ustaw FPS, dołączaj do prywatnych serwerów."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#080808;--surface:#111;--surface2:#181818;--border:#222;--accent:#e8505b;--accent2:#ff6b6b;--text:#f0f0f0;--muted:#666;--muted2:#999;--green:#4caf7d;--mono:'Geist Mono',monospace;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6;}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:60px;background:rgba(8,8,8,0.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.04);}
+.nav-logo{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:2px;}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{color:var(--muted2);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--text);}
+.nav-lang{display:flex;gap:4px;margin-left:12px;padding-left:16px;border-left:1px solid var(--border);}
+.lang-btn{background:none;border:1px solid transparent;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;padding:3px 7px;border-radius:4px;transition:all .15s;font-family:'Inter',sans-serif;}
+.lang-btn.active{color:var(--text);border-color:var(--border);}
+.lang-btn:hover{color:var(--text);}
+/* HERO */
+#hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 40px 60px;overflow:hidden;}
+#hero::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(232,80,91,0.08) 0%,transparent 70%);pointer-events:none;}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;max-width:1100px;width:100%;position:relative;z-index:1;}
+.hero-left{display:flex;flex-direction:column;justify-content:center;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:2px;margin-bottom:22px;opacity:0;animation:fadeUp .6s .2s forwards;}
+.hero-eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--accent);}
+.hero-title{font-size:clamp(38px,5vw,62px);font-weight:900;line-height:1.05;letter-spacing:-1.5px;margin-bottom:20px;opacity:0;animation:fadeUp .6s .35s forwards;}
+.hero-title span{color:var(--accent);display:block;}
+.hero-by{font-size:clamp(13px,1.5vw,16px);color:var(--muted2);margin-bottom:36px;opacity:0;animation:fadeUp .6s .5s forwards;}
+.hero-by strong{color:var(--text);font-weight:600;}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;opacity:0;animation:fadeUp .6s .65s forwards;}
+.btn-dl{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;background:var(--accent);color:#fff;text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;transition:all .2s;}
+.btn-dl:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,80,91,.3);}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border:1px solid var(--border);color:var(--muted2);text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;transition:all .2s;}
+.btn-ghost:hover{border-color:#444;color:var(--text);}
+/* MOCKUP */
+.hero-right{display:flex;align-items:center;justify-content:center;opacity:0;animation:fadeLeft .8s .5s forwards;}
+.app-mockup{width:100%;max-width:480px;background:#111;border:1px solid #222;border-radius:12px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.03);}
+.mockup-titlebar{height:38px;background:#080808;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;padding:0 14px;gap:6px;}
+.mockup-dot{width:10px;height:10px;border-radius:50%;}
+.mockup-title{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:1.5px;margin-left:6px;}
+.mockup-body{display:flex;height:240px;}
+.mockup-sidebar{width:140px;background:#0a0a0a;border-right:1px solid #1a1a1a;padding:10px 0;}
+.mockup-nav{padding:8px 14px;font-size:10px;color:#555;display:flex;align-items:center;gap:7px;border-left:2px solid transparent;}
+.mockup-nav.active{color:var(--text);border-left-color:var(--accent);background:#111;}
+.mockup-content{flex:1;padding:14px;overflow:hidden;}
+.mockup-card{background:#181818;border:1px solid #222;border-radius:6px;padding:10px;margin-bottom:8px;}
+.mockup-account{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.mockup-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#e8505b,#7a1a21);flex-shrink:0;}
+.mockup-name{font-size:11px;font-weight:700;}
+.mockup-id{font-size:9px;color:var(--muted);font-family:var(--mono);}
+.mockup-status{display:flex;align-items:center;gap:5px;padding:4px 7px;background:#111;border-radius:4px;font-size:9px;color:var(--muted2);}
+.sdot{width:5px;height:5px;border-radius:50%;}
+.sdot.online{background:var(--green);animation:pulse 2s infinite;}
+.sdot.ingame{background:#5b9cf6;}
+/* SECTIONS */
+section{position:relative;z-index:1;}
+.section-inner{max-width:1100px;margin:0 auto;padding:100px 40px;}
+/* STATS */
+#stats{border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+#stats .section-inner{padding:60px 40px;display:grid;grid-template-columns:repeat(3,1fr);gap:40px;}
+.stat{text-align:center;opacity:0;transform:translateY(20px);transition:all .5s;}
+.stat.visible{opacity:1;transform:none;}
+.stat-num{font-size:48px;font-weight:900;color:var(--accent);letter-spacing:-2px;line-height:1;margin-bottom:6px;}
+.stat-label{font-size:13px;color:var(--muted2);}
+/* FEATURES */
+.section-label{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;}
+.section-title{font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-1px;line-height:1.1;margin-bottom:16px;}
+.section-sub{font-size:16px;color:var(--muted2);max-width:500px;line-height:1.7;margin-bottom:60px;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.feature{background:var(--surface);padding:32px 28px;position:relative;overflow:hidden;opacity:0;transform:translateY(16px);transition:all .5s;}
+.feature.visible{opacity:1;transform:none;}
+.feature::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .3s;}
+.feature:hover::before{opacity:1;}
+.feature:hover{background:var(--surface2);}
+.feature-icon{font-size:26px;margin-bottom:16px;display:block;}
+.feature-title{font-size:15px;font-weight:700;margin-bottom:8px;}
+.feature-desc{font-size:13px;color:var(--muted2);line-height:1.6;}
+.feature-tag{display:inline-block;margin-top:12px;padding:2px 8px;background:rgba(232,80,91,.1);border:1px solid rgba(232,80,91,.2);border-radius:4px;font-size:10px;color:var(--accent);font-family:var(--mono);}
+/* SCREENSHOTS */
+.screenshots-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.screenshot-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;opacity:0;transform:translateY(20px);transition:all .5s;}
+.screenshot-card.visible{opacity:1;transform:none;}
+.screenshot-card:hover{border-color:#333;transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.4);}
+.screenshot-preview{height:200px;background:#0f0f0f;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.screenshot-inner{width:90%;height:85%;background:#111;border:1px solid #222;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;}
+.ss-bar{height:22px;background:#080808;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;padding:0 8px;gap:4px;}
+.ss-dot{width:6px;height:6px;border-radius:50%;}
+.ss-body{flex:1;display:flex;}
+.ss-sidebar{width:80px;background:#0a0a0a;border-right:1px solid #1a1a1a;padding:6px 0;}
+.ss-nav{height:18px;margin:2px 6px;border-radius:3px;background:#151515;}
+.ss-nav.active{background:#1a1a1a;border-left:2px solid var(--accent);}
+.ss-content{flex:1;padding:8px;}
+.ss-card{height:28px;background:#181818;border-radius:4px;margin-bottom:5px;border:1px solid #222;}
+.ss-card.wide{width:100%;}
+.ss-row{display:flex;gap:4px;margin-bottom:5px;}
+.ss-pill{height:20px;background:#181818;border-radius:10px;border:1px solid #222;flex:1;}
+.ss-pill.accent{background:rgba(232,80,91,.15);border-color:rgba(232,80,91,.3);}
+.ss-slider{height:4px;background:#222;border-radius:2px;margin:8px 0;position:relative;}
+.ss-slider::after{content:'';position:absolute;left:0;top:0;height:100%;width:60%;background:var(--accent);border-radius:2px;}
+.screenshot-meta{padding:14px 16px;}
+.screenshot-name{font-size:13px;font-weight:600;margin-bottom:3px;}
+.screenshot-desc{font-size:12px;color:var(--muted2);}
+/* DOWNLOAD */
+#download{text-align:center;}
+#download .section-inner{padding:120px 40px;}
+#download .section-sub{margin:0 auto 44px;text-align:center;}
+.dl-card{display:inline-flex;flex-direction:column;align-items:center;gap:28px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:48px 64px;position:relative;overflow:hidden;max-width:480px;width:100%;opacity:0;transform:translateY(20px);transition:all .6s;}
+.dl-card.visible{opacity:1;transform:none;}
+.dl-card::before{content:'';position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(232,80,91,.15),transparent 60%);border-radius:16px;pointer-events:none;}
+.dl-version{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:2px;}
+.dl-info{font-size:13px;color:var(--muted2);}
+.dl-req{display:flex;gap:16px;font-size:12px;color:var(--muted);}
+.dl-req span::before{content:'✓ ';color:var(--green);}
+/* ABOUT */
+#about{border-top:1px solid var(--border);}
+#about .section-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.about-avatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#e8505b,#7a1a21);display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:20px;box-shadow:0 0 40px rgba(232,80,91,.2);}
+.about-name{font-size:30px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px;}
+.about-role{font-size:13px;color:var(--accent);font-family:var(--mono);margin-bottom:18px;letter-spacing:1px;}
+.about-text{font-size:15px;color:var(--muted2);line-height:1.8;margin-bottom:24px;}
+.about-links{display:flex;gap:10px;}
+.about-link{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border:1px solid var(--border);border-radius:7px;color:var(--muted2);text-decoration:none;font-size:13px;font-weight:600;transition:all .2s;}
+.about-link:hover{border-color:#444;color:var(--text);}
+.about-link.yt:hover{border-color:var(--accent);color:var(--accent);}
+.about-right{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;}
+.about-right h3{font-size:11px;font-weight:700;margin-bottom:18px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;}
+.timeline{list-style:none;}
+.timeline li{display:flex;gap:16px;padding-bottom:20px;position:relative;}
+.timeline li::before{content:'';position:absolute;left:15px;top:28px;bottom:0;width:1px;background:var(--border);}
+.timeline li:last-child::before{display:none;}
+.tl-dot{width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.tl-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.tl-desc{font-size:12px;color:var(--muted2);}
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto;}
+.footer-logo{font-size:12px;color:var(--muted);font-family:var(--mono);}
+.footer-copy{font-size:12px;color:var(--muted);}
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes fadeLeft{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(76,175,125,.4)}50%{box-shadow:0 0 0 4px rgba(76,175,125,0)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(400%)}}
+.scanline{position:absolute;top:0;left:0;right:0;height:40px;background:linear-gradient(180deg,transparent,rgba(232,80,91,.03),transparent);animation:scanline 3s linear infinite;pointer-events:none;}
+/* RESPONSIVE */
+@media(max-width:900px){.hero-grid,#about .section-inner{grid-template-columns:1fr;gap:40px}.features-grid{grid-template-columns:1fr 1fr}.screenshots-grid{grid-template-columns:1fr}#stats .section-inner{grid-template-columns:repeat(3,1fr);gap:20px}nav{padding:0 20px}.nav-links{gap:16px}.section-inner{padding:60px 20px}footer{flex-direction:column;gap:10px;text-align:center}}
+@media(max-width:600px){.features-grid{grid-template-columns:1fr}#stats .section-inner{grid-template-columns:1fr}.hero-cta{flex-direction:column}.nav-links{display:none}.dl-card{padding:32px 24px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">⬛ RAM</div>
+  <div class="nav-links">
+    <a href="#features" data-i18n="nav.features">Funkcje</a>
+    <a href="#screenshots" data-i18n="nav.screenshots">Zrzuty ekranu</a>
+    <a href="#download" data-i18n="nav.download">Pobierz</a>
+    <a href="#about" data-i18n="nav.about">O autorze</a>
+    <div class="nav-lang">
+      <button class="lang-btn active" onclick="setLang('pl')">PL</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="scanline"></div>
+  <div class="hero-grid">
+    <div class="hero-left">
+      <div class="hero-eyebrow" data-i18n="hero.eyebrow">Windows 10/11 · Darmowe</div>
+      <h1 class="hero-title">Roblox<br/><span>Account</span>Manager</h1>
+      <p class="hero-by" data-i18n-html="hero.by">Aplikacja do zarządzania kontami Roblox — <strong>by Ziorbek</strong></p>
+      <div class="hero-cta">
+        <a href="https://drive.google.com/drive/folders/YOUR_FOLDER_ID" target="_blank" class="btn-dl" data-i18n="hero.download">↓ Pobierz za darmo</a>
+        <a href="#features" class="btn-ghost" data-i18n="hero.learnmore">Zobacz funkcje →</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="app-mockup">
+        <div class="mockup-titlebar">
+          <div class="mockup-dot" style="background:#e8505b"></div>
+          <div class="mockup-dot" style="background:#f5a623"></div>
+          <div class="mockup-dot" style="background:#4caf7d"></div>
+          <span class="mockup-title">⬛ ROBLOX MANAGER</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-sidebar">
+            <div class="mockup-nav active">👤 <span style="font-size:9px" data-i18n="mock.accounts">Konta</span></div>
+            <div class="mockup-nav">➕ <span style="font-size:9px" data-i18n="mock.add">Dodaj</span></div>
+            <div class="mockup-nav">🚀 <span style="font-size:9px" data-i18n="mock.launch">Uruchom</span></div>
+            <div class="mockup-nav">⚙️ <span style="font-size:9px">FPS</span></div>
+          </div>
+          <div class="mockup-content">
+            <div class="mockup-card">
+              <div class="mockup-account">
+                <div class="mockup-avatar"></div>
+                <div><div class="mockup-name">ZiorbekRestock</div><div class="mockup-id">ID: 7643323265</div></div>
+              </div>
+              <div class="mockup-status"><div class="sdot ingame"></div><span style="font-size:9px">🎮 Pet Simulator 99</span></div>
+            </div>
+            <div class="mockup-card">
+              <div class="mockup-account">
+                <div class="mockup-avatar" style="background:linear-gradient(135deg,#5b9cf6,#1a3a7a)"></div>
+                <div><div class="mockup-name">Account #2</div><div class="mockup-id">[FARM]</div></div>
+              </div>
+              <div class="mockup-status"><div class="sdot online"></div><span style="font-size:9px" data-i18n="mock.online">Online</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stats">
+  <div class="section-inner">
+    <div class="stat"><div class="stat-num" data-count="100">0</div><div class="stat-label" data-i18n="stats.free">% Darmowe</div></div>
+    <div class="stat"><div class="stat-num" data-count="9">0</div><div class="stat-label" data-i18n="stats.features">Kluczowych funkcji</div></div>
+    <div class="stat"><div class="stat-num" data-count="0">0</div><div class="stat-label" data-i18n="stats.ads">Reklam, trackerów, telemetrii</div></div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="section-inner">
+    <p class="section-label" data-i18n="feat.label">Funkcje</p>
+    <h2 class="section-title" data-i18n-html="feat.title">Wszystko czego<br/>potrzebujesz</h2>
+    <p class="section-sub" data-i18n="feat.sub">Jedno narzędzie do zarządzania kontami Roblox.</p>
+    <div class="features-grid">
+      <div class="feature"><span class="feature-icon">🌐</span><div class="feature-title" data-i18n="f1.title">Logowanie przez przeglądarkę</div><p class="feature-desc" data-i18n="f1.desc">Wbudowana przeglądarka — logujesz się normalnie na roblox.com. Sesja zapisana na stałe, bez wklejania cookie.</p><span class="feature-tag">Electron Session</span></div>
+      <div class="feature"><span class="feature-icon">🎮</span><div class="feature-title" data-i18n="f2.title">Uruchamianie gier</div><p class="feature-desc" data-i18n="f2.desc">Dołącz do dowolnej gry po Place ID lub z listy ulubionych — konto wymuszone automatycznie przez ticket.</p><span class="feature-tag">Auth Ticket API</span></div>
+      <div class="feature"><span class="feature-icon">🔗</span><div class="feature-title" data-i18n="f3.title">Prywatne serwery</div><p class="feature-desc" data-i18n="f3.desc">Dołącz przez link Share lub privateServerLinkCode. Ulubione serwery zapisane — jeden klik i grasz.</p><span class="feature-tag">Share Links</span></div>
+      <div class="feature"><span class="feature-icon">📊</span><div class="feature-title" data-i18n="f4.title">Statusy kont</div><p class="feature-desc" data-i18n="f4.desc">Sprawdź w czasie rzeczywistym czy konto jest online, offline, lub w jakiej grze się aktualnie znajduje.</p><span class="feature-tag">Presence API</span></div>
+      <div class="feature"><span class="feature-icon">⚙️</span><div class="feature-title" data-i18n="f5.title">FPS i jakość grafiki</div><p class="feature-desc" data-i18n="f5.desc">Ustaw limit FPS (30–240) i poziom grafiki bezpośrednio w pliku XML Roblox. Działa po restarcie gry.</p><span class="feature-tag">GlobalBasicSettings.xml</span></div>
+      <div class="feature"><span class="feature-icon">⭐</span><div class="feature-title" data-i18n="f6.title">Ulubione gry i serwery</div><p class="feature-desc" data-i18n="f6.desc">Zapisz ulubione gry i prywatne serwery. Miniaturka i nazwa pobierane automatycznie z API Roblox.</p><span class="feature-tag">Favorites</span></div>
+      <div class="feature"><span class="feature-icon">✏️</span><div class="feature-title" data-i18n="f7.title">Prefixy kont</div><p class="feature-desc" data-i18n="f7.desc">Oznacz każde konto własnym prefiksem np. [FARM], [MAIN] dla lepszej organizacji wielu kont.</p><span class="feature-tag">Labeling</span></div>
+      <div class="feature"><span class="feature-icon">🔒</span><div class="feature-title" data-i18n="f8.title">Bezpieczeństwo</div><p class="feature-desc" data-i18n="f8.desc">Sesje szyfrowane lokalnie. Żadne dane nie opuszczają Twojego komputera. Brak zewnętrznych serwerów.</p><span class="feature-tag">AES Encrypted</span></div>
+      <div class="feature"><span class="feature-icon">🎬</span><div class="feature-title" data-i18n="f9.title">Ekran startowy</div><p class="feature-desc" data-i18n="f9.desc">Animowany splash screen z płynnym wjazdem nazwy i autora przy każdym uruchomieniu aplikacji.</p><span class="feature-tag">Canvas Animation</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="screenshots">
+  <div class="section-inner">
+    <p class="section-label" data-i18n="ss.label">Zrzuty ekranu</p>
+    <h2 class="section-title" data-i18n-html="ss.title">Jak wygląda<br/>aplikacja</h2>
+    <p class="section-sub" data-i18n="ss.sub">Czysty, ciemny interfejs dostosowany do klimatu Roblox.</p>
+    <div class="screenshots-grid">
+      <div class="screenshot-card">
+        <div class="screenshot-preview">
+          <div class="screenshot-inner">
+            <div class="ss-bar"><div class="ss-dot" style="background:#e8505b"></div><div class="ss-dot" style="background:#f5a623"></div><div class="ss-dot" style="background:#4caf7d"></div></div>
+            <div class="ss-body"><div class="ss-sidebar"><div class="ss-nav active"></div><div class="ss-nav"></div><div class="ss-nav"></div><div class="ss-nav"></div></div><div class="ss-content"><div class="ss-card wide"></div><div class="ss-card wide"></div><div class="ss-row"><div class="ss-pill"></div><div class="ss-pill accent"></div></div></div></div>
+          </div>
+        </div>
+        <div class="screenshot-meta"><div class="screenshot-name" data-i18n="ss1.name">Lista kont</div><div class="screenshot-desc" data-i18n="ss1.desc">Avatary, statusy w czasie rzeczywistym, prefixy</div></div>
+      </div>
+      <div class="screenshot-card">
+        <div class="screenshot-preview">
+          <div class="screenshot-inner">
+            <div class="ss-bar"><div class="ss-dot" style="background:#e8505b"></div><div class="ss-dot" style="background:#f5a623"></div><div class="ss-dot" style="background:#4caf7d"></div></div>
+            <div class="ss-body"><div class="ss-sidebar"><div class="ss-nav"></div><div class="ss-nav"></div><div class="ss-nav active"></div><div class="ss-nav"></div></div><div class="ss-content"><div class="ss-card wide" style="height:44px"></div><div class="ss-card" style="width:55%"></div><div class="ss-row"><div class="ss-pill"></div><div class="ss-pill"></div></div></div></div>
+          </div>
+        </div>
+        <div class="screenshot-meta"><div class="screenshot-name" data-i18n="ss2.name">Uruchom / Dołącz</div><div class="screenshot-desc" data-i18n="ss2.desc">Ulubione gry, prywatne serwery</div></div>
+      </div>
+      <div class="screenshot-card">
+        <div class="screenshot-preview">
+          <div class="screenshot-inner">
+            <div class="ss-bar"><div class="ss-dot" style="background:#e8505b"></div><div class="ss-dot" style="background:#f5a623"></div><div class="ss-dot" style="background:#4caf7d"></div></div>
+            <div class="ss-body"><div class="ss-sidebar"><div class="ss-nav"></div><div class="ss-nav"></div><div class="ss-nav"></div><div class="ss-nav active"></div></div><div class="ss-content"><div style="display:grid;grid-template-columns:1fr 1fr;gap:5px"><div class="ss-card" style="height:56px;padding:8px"><div style="height:5px;background:#2a2a2a;border-radius:2px;margin-bottom:10px;width:55%"></div><div class="ss-slider"></div></div><div class="ss-card" style="height:56px;padding:8px"><div style="height:5px;background:#2a2a2a;border-radius:2px;margin-bottom:10px;width:45%"></div><div class="ss-slider"></div></div></div></div></div>
+          </div>
+        </div>
+        <div class="screenshot-meta"><div class="screenshot-name" data-i18n="ss3.name">Flagi / FPS</div><div class="screenshot-desc" data-i18n="ss3.desc">Suwaki FPS i jakości grafiki, edycja XML</div></div>
+      </div>
+      <div class="screenshot-card">
+        <div class="screenshot-preview" style="background:#050505;flex-direction:column;gap:6px">
+          <div style="font-size:11px;font-family:'Geist Mono',monospace;color:#333;letter-spacing:3px">ROBLOX</div>
+          <div style="font-size:24px;font-weight:900;color:var(--accent);letter-spacing:4px">ACCOUNT MANAGER</div>
+          <div style="width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:4px 0"></div>
+          <div style="font-size:11px;color:#444;letter-spacing:2px">by <span style="color:#e8505b;font-weight:700">ZIORBEK</span></div>
+        </div>
+        <div class="screenshot-meta"><div class="screenshot-name" data-i18n="ss4.name">Animacja startowa</div><div class="screenshot-desc" data-i18n="ss4.desc">Canvas intro przy każdym uruchomieniu</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="download">
+  <div class="section-inner">
+    <p class="section-label" data-i18n="dl.label">Pobierz</p>
+    <h2 class="section-title" data-i18n="dl.title">Zacznij za darmo</h2>
+    <p class="section-sub" data-i18n="dl.sub">Bez rejestracji, bez reklam, bez telemetrii.</p>
+    <div class="dl-card">
+      <div class="dl-version" data-i18n="dl.version">ROBLOX ACCOUNT MANAGER v1.0</div>
+      <a href="https://drive.google.com/drive/folders/YOUR_FOLDER_ID" target="_blank" class="btn-dl" style="width:100%;justify-content:center;font-size:16px;padding:16px" data-i18n="dl.btn">↓ Pobierz z Google Drive</a>
+      <div class="dl-req"><span>Windows 10/11</span><span data-i18n="dl.req2">Brak dodatkowych wymagań</span></div>
+      <div class="dl-info" data-i18n="dl.info">Instalator .exe — skrót pojawi się automatycznie na pulpicie</div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="section-inner">
+    <div>
+      <div class="about-avatar">Z</div>
+      <div class="about-name">Ziorbek</div>
+      <div class="about-role" data-i18n="about.role">// Developer · Content Creator</div>
+      <p class="about-text" data-i18n="about.text">Twórca Roblox Account Managera — darmowego narzędzia do zarządzania kontami Roblox. Pasjonat gamedev i tworzenia narzędzi dla graczy.</p>
+      <div class="about-links">
+        <a href="https://www.youtube.com/@ziorbek_" target="_blank" class="about-link yt">▶ YouTube</a>
+        <a href="https://github.com" target="_blank" class="about-link">⌥ GitHub</a>
+      </div>
+    </div>
+    <div class="about-right">
+      <h3 data-i18n="about.timeline">Historia wersji</h3>
+      <ul class="timeline">
+        <li><div class="tl-dot">🎉</div><div><div class="tl-title">v1.0 — Premiera</div><div class="tl-desc" data-i18n="tl1">Logowanie, statusy, uruchamianie gier, animacja startowa</div></div></li>
+        <li><div class="tl-dot">⚙️</div><div><div class="tl-title">v1.0 — FPS &amp; XML</div><div class="tl-desc" data-i18n="tl2">Edytor FPS i jakości grafiki przez GlobalBasicSettings.xml</div></div></li>
+        <li><div class="tl-dot">🔗</div><div><div class="tl-title">v1.0 — Prywatne serwery</div><div class="tl-desc" data-i18n="tl3">Share links, privateServerLinkCode, ulubione serwery</div></div></li>
+        <li><div class="tl-dot">🚀</div><div><div class="tl-title" data-i18n="tl4.title">v2.0 — W planach</div><div class="tl-desc" data-i18n="tl4.desc">Automatyczne aktualizacje, Discord RPC</div></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">⬛ ROBLOX ACCOUNT MANAGER</div>
+  <div class="footer-copy" data-i18n="footer">© 2025 Ziorbek · Nie powiązane z Roblox Corporation</div>
+</footer>
+
+<script>
+const T={pl:{'nav.features':'Funkcje','nav.screenshots':'Zrzuty ekranu','nav.download':'Pobierz','nav.about':'O autorze','hero.eyebrow':'Windows 10/11 · Darmowe','hero.by':'Aplikacja do zarządzania kontami Roblox — <strong>by Ziorbek</strong>','hero.download':'↓ Pobierz za darmo','hero.learnmore':'Zobacz funkcje →','mock.accounts':'Konta','mock.add':'Dodaj','mock.launch':'Uruchom','mock.online':'Online','stats.free':'% Darmowe','stats.features':'Kluczowych funkcji','stats.ads':'Reklam, trackerów, telemetrii','feat.label':'Funkcje','feat.title':'Wszystko czego<br/>potrzebujesz','feat.sub':'Jedno narzędzie do zarządzania kontami Roblox.','f1.title':'Logowanie przez przeglądarkę','f1.desc':'Wbudowana przeglądarka — logujesz się normalnie na roblox.com. Sesja zapisana na stałe, bez wklejania cookie.','f2.title':'Uruchamianie gier','f2.desc':'Dołącz do dowolnej gry po Place ID lub z listy ulubionych — konto wymuszone automatycznie przez ticket.','f3.title':'Prywatne serwery','f3.desc':'Dołącz przez link Share lub privateServerLinkCode. Ulubione serwery zapisane — jeden klik i grasz.','f4.title':'Statusy kont','f4.desc':'Sprawdź w czasie rzeczywistym czy konto jest online, offline, lub w jakiej grze się aktualnie znajduje.','f5.title':'FPS i jakość grafiki','f5.desc':'Ustaw limit FPS (30–240) i poziom grafiki bezpośrednio w pliku XML Roblox. Działa po restarcie gry.','f6.title':'Ulubione gry i serwery','f6.desc':'Zapisz ulubione gry i prywatne serwery. Miniaturka i nazwa pobierane automatycznie z API Roblox.','f7.title':'Prefixy kont','f7.desc':'Oznacz każde konto własnym prefiksem np. [FARM], [MAIN] dla lepszej organizacji wielu kont.','f8.title':'Bezpieczeństwo','f8.desc':'Sesje szyfrowane lokalnie. Żadne dane nie opuszczają Twojego komputera. Brak zewnętrznych serwerów.','f9.title':'Ekran startowy','f9.desc':'Animowany splash screen z płynnym wjazdem nazwy i autora przy każdym uruchomieniu aplikacji.','ss.label':'Zrzuty ekranu','ss.title':'Jak wygląda<br/>aplikacja','ss.sub':'Czysty, ciemny interfejs dostosowany do klimatu Roblox.','ss1.name':'Lista kont','ss1.desc':'Avatary, statusy w czasie rzeczywistym, prefixy','ss2.name':'Uruchom / Dołącz','ss2.desc':'Ulubione gry, prywatne serwery','ss3.name':'Flagi / FPS','ss3.desc':'Suwaki FPS i jakości grafiki, edycja XML','ss4.name':'Animacja startowa','ss4.desc':'Canvas intro przy każdym uruchomieniu','dl.label':'Pobierz','dl.title':'Zacznij za darmo','dl.sub':'Bez rejestracji, bez reklam, bez telemetrii.','dl.version':'ROBLOX ACCOUNT MANAGER v1.0','dl.btn':'↓ Pobierz z Google Drive','dl.req2':'Brak dodatkowych wymagań','dl.info':'Instalator .exe — skrót pojawi się automatycznie na pulpicie','about.role':'// Deweloper · Twórca treści','about.text':'Twórca Roblox Account Managera — darmowego narzędzia do zarządzania kontami Roblox. Pasjonat gamedev i tworzenia narzędzi dla graczy.','about.timeline':'Historia wersji','tl1':'Logowanie, statusy, uruchamianie gier, animacja startowa','tl2':'Edytor FPS i jakości grafiki przez GlobalBasicSettings.xml','tl3':'Share links, privateServerLinkCode, ulubione serwery','tl4.title':'v2.0 — W planach','tl4.desc':'Automatyczne aktualizacje, Discord RPC','footer':'© 2025 Ziorbek · Nie powiązane z Roblox Corporation'},en:{'nav.features':'Features','nav.screenshots':'Screenshots','nav.download':'Download','nav.about':'About','hero.eyebrow':'Windows 10/11 · Free','hero.by':'A Roblox account management tool — <strong>by Ziorbek</strong>','hero.download':'↓ Download free','hero.learnmore':'See features →','mock.accounts':'Accounts','mock.add':'Add','mock.launch':'Launch','mock.online':'Online','stats.free':'% Free','stats.features':'Key features','stats.ads':'Ads, trackers or telemetry','feat.label':'Features','feat.title':'Everything you<br/>need','feat.sub':'One tool to manage your Roblox accounts.','f1.title':'Browser login','f1.desc':'Built-in browser — log in normally on roblox.com. Session saved permanently, no cookie pasting.','f2.title':'Game launcher','f2.desc':'Join any game by Place ID or from favorites — account forced automatically via auth ticket.','f3.title':'Private servers','f3.desc':'Join via Share link or privateServerLinkCode. Saved favorites — one click and you\'re in.','f4.title':'Account statuses','f4.desc':'Check in real-time whether an account is online, offline, or which game it\'s currently playing.','f5.title':'FPS & graphics quality','f5.desc':'Set FPS cap (30–240) and graphics level directly in Roblox\'s XML file. Takes effect after restart.','f6.title':'Favorite games & servers','f6.desc':'Save favorite games and private servers. Thumbnail and name fetched automatically from Roblox API.','f7.title':'Account prefixes','f7.desc':'Label each account with a custom prefix e.g. [FARM], [MAIN] for better organization.','f8.title':'Security','f8.desc':'Sessions encrypted locally. No data leaves your computer. No external servers.','f9.title':'Splash screen','f9.desc':'Animated intro with smooth slide-in animation of title and author on every launch.','ss.label':'Screenshots','ss.title':'What the app<br/>looks like','ss.sub':'Clean dark interface built for the Roblox aesthetic.','ss1.name':'Account list','ss1.desc':'Avatars, real-time statuses, prefixes','ss2.name':'Launch / Join','ss2.desc':'Favorite games, private servers','ss3.name':'Flags / FPS','ss3.desc':'FPS and quality sliders, XML editor','ss4.name':'Intro animation','ss4.desc':'Canvas intro on every launch','dl.label':'Download','dl.title':'Start for free','dl.sub':'No registration, no ads, no telemetry.','dl.version':'ROBLOX ACCOUNT MANAGER v1.0','dl.btn':'↓ Download from Google Drive','dl.req2':'No additional requirements','dl.info':'.exe installer — shortcut created automatically on desktop','about.role':'// Developer · Content Creator','about.text':'Creator of Roblox Account Manager — a free tool for managing Roblox accounts. Passionate about gamedev and building tools for players.','about.timeline':'Version history','tl1':'Login, statuses, game launcher, splash screen','tl2':'FPS & graphics quality editor via GlobalBasicSettings.xml','tl3':'Share links, privateServerLinkCode, favorite servers','tl4.title':'v2.0 — Planned','tl4.desc':'Auto-updates, Discord RPC','footer':'© 2025 Ziorbek · Not affiliated with Roblox Corporation'}};
+
+let lang='pl';
+function setLang(l){
+  lang=l;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const v=T[l][el.dataset.i18n];if(v!==undefined)el.textContent=v;});
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{const v=T[l][el.dataset.i18nHtml];if(v!==undefined)el.innerHTML=v;});
+}
+
+const io=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),e.target.dataset.delay||0);io.unobserve(e.target);}});},{threshold:0.1});
+document.querySelectorAll('.feature,.stat,.screenshot-card,.dl-card').forEach((el,i)=>{el.dataset.delay=(i%3)*80;io.observe(el);});
+
+const co=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(!entry.isIntersecting)return;const el=entry.target.querySelector('[data-count]');if(!el)return;const target=parseInt(el.dataset.count),dur=1200,start=performance.now();const tick=now=>{const p=Math.min((now-start)/dur,1),ease=1-Math.pow(1-p,3);el.textContent=Math.round(ease*target);if(p<1)requestAnimationFrame(tick);};requestAnimationFrame(tick);co.unobserve(entry.target);});},{threshold:0.5});
+document.querySelectorAll('.stat').forEach(el=>co.observe(el));
+
+window.addEventListener('scroll',()=>{document.querySelector('nav').style.background=window.scrollY>20?'rgba(8,8,8,0.97)':'rgba(8,8,8,0.88)';});
+</script>
+</body>
+</html>
